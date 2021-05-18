@@ -1,0 +1,15 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: multi-tenant-poc
+build:
+  artifacts:
+  - image: multi-tenant-poc
+    context: .
+    jib: {}
+  local: {}
+
+deploy:
+  kubectl:
+    manifests:
+    - k8s/deploy.yaml

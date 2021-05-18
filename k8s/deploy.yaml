@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: multi-tenant-poc
+  labels:
+    app: multi-tenant-poc
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: multi-tenant-poc
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-tenant-poc
+  namespace: default
+  labels:
+    app: multi-tenant-poc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multi-tenant-poc
+  template:
+    metadata:
+      labels:
+        app: multi-tenant-poc
+    spec:
+      containers:
+        - name: multi-tenant-poc
+          image: multi-tenant-poc
+          env:
+            - name: USER_NAME
+              value: "root"
+            - name: PASSWORD
+              value: "example"
+            - name: MONGO_HOST
+              value: "192.168.1.71"
+            - name: MONGO_PORT
+              value: "27017"
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8443
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
